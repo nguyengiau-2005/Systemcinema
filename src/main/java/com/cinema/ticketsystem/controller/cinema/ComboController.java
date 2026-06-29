@@ -41,10 +41,10 @@ public class ComboController {
 
         var result = new java.util.ArrayList<SnackItem>();
         for (Concession d : drinks) {
-            result.add(new SnackItem(d.getId(), d.getName(), "DRINK", d.getPrice()));
+            result.add(new SnackItem(d.getId(), d.getName(), "DRINK", d.getPrice(), d.getStockQuantity(), d.getAlertThreshold()));
         }
         for (Concession p : popcorns) {
-            result.add(new SnackItem(p.getId(), p.getName(), "POPCORN", p.getPrice()));
+            result.add(new SnackItem(p.getId(), p.getName(), "POPCORN", p.getPrice(), p.getStockQuantity(), p.getAlertThreshold()));
         }
         return result;
     }
@@ -138,6 +138,12 @@ public class ComboController {
         if (drinkDetails.getDescription() != null) {
             existingDrink.setDescription(drinkDetails.getDescription());
         }
+        if (drinkDetails.getStockQuantity() != null) {
+            existingDrink.setStockQuantity(drinkDetails.getStockQuantity());
+        }
+        if (drinkDetails.getAlertThreshold() != null) {
+            existingDrink.setAlertThreshold(drinkDetails.getAlertThreshold());
+        }
 
         Concession updatedDrink = concessionRepository.save(existingDrink);
         return ResponseEntity.ok(updatedDrink);
@@ -178,6 +184,12 @@ public class ComboController {
         }
         if (popcornDetails.getActive() != null) {
             existingPopcorn.setActive(popcornDetails.getActive());
+        }
+        if (popcornDetails.getStockQuantity() != null) {
+            existingPopcorn.setStockQuantity(popcornDetails.getStockQuantity());
+        }
+        if (popcornDetails.getAlertThreshold() != null) {
+            existingPopcorn.setAlertThreshold(popcornDetails.getAlertThreshold());
         }
 
         Concession updatedPopcorn = concessionRepository.save(existingPopcorn);

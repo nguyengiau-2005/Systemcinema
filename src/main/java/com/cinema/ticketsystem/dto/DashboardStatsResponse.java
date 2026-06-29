@@ -18,6 +18,18 @@ public class DashboardStatsResponse {
     private List<RevenueData> revenueData;
     private List<MovieTypeData> movieTypeData;
     private List<RecentTransaction> recentTransactions;
+    private List<TopMovieData> topMovies;
+
+    @Data
+    public static class TopMovieData {
+        private String title;
+        private BigDecimal revenue;
+        
+        public TopMovieData(String title, BigDecimal revenue) {
+            this.title = title;
+            this.revenue = revenue;
+        }
+    }
 
     @Data
     public static class RevenueData {

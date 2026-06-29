@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/showtime-seats/showtime/**").permitAll()
                         .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/admin/stats/**").permitAll()
+                        .requestMatchers("/api/admin/loyalty/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/banner-config").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/discount-codes/public").permitAll()

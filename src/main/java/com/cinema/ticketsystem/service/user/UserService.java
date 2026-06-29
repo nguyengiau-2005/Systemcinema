@@ -8,4 +8,5 @@ public interface UserService {
     List<User> findAll();
     User save(User user);
     User findById(Long id);
+    List<User> getTopGamers();
 }

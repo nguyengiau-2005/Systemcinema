@@ -32,4 +32,17 @@ public class DiscountCode {
     private Integer maxUsage;
 
     private Integer usedCount = 0;
+
+    private Double minOrderValue;
+
+    // Thêm liên kết vật lý để vẽ ERD
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicable_movie_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
+    private Movie applicableMovie;
+
+    @Column(name = "applicable_movie_id")
+    private Long applicableMovieId;
 }

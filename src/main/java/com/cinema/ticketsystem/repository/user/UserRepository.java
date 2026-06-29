@@ -12,4 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     //lay tat ca danh sach user
     List<User> findAll();
+
+    // Lấy top 10 user điểm cao nhất cho bảng xếp hạng
+    List<User> findTop10ByOrderByLoyaltyPointsDesc();
 }

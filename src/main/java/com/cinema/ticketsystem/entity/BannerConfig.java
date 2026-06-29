@@ -1,5 +1,6 @@
 package com.cinema.ticketsystem.entity;
 
+import com.cinema.ticketsystem.entity.cinema.Movie;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,9 +13,11 @@ public class BannerConfig {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** ID của phim được chọn vào banner */
-    @Column(name = "movie_id", nullable = false)
-    private Long movieId;
+    /** Phim được chọn vào banner - liên kết khóa ngoại đến bảng movies */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_banner_config_movie"))
+    private Movie movie;
 
     /** Thứ tự hiển thị (0, 1, 2, ...) */
     @Column(name = "display_order", nullable = false)

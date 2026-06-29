@@ -16,11 +16,13 @@ export default function Login() {
   // Quản lý trạng thái giao diện
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
+    setSuccessMessage('');
 
     try {
       // 2. Bắn dữ liệu credentials ({ username, password }) lên backend giống hệt Admin
@@ -62,8 +64,11 @@ export default function Login() {
           }));
         }
 
-        // Đăng nhập thành công, chuyển hướng sang trang cá nhân
-        navigate('/');
+        // Đăng nhập thành công, hiển thị thông báo và chuyển hướng sau 3 giây
+        setSuccessMessage('Đăng nhập thành công! Đang chuyển hướng...');
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
       } else {
         setErrorMessage('Không nhận được token từ hệ thống. Vui lòng thử đăng nhập lại.');
       }
@@ -108,6 +113,17 @@ export default function Login() {
                 className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center font-medium"
               >
                 {errorMessage}
+              </motion.div>
+            )}
+
+            {/* Vùng hiển thị thông báo thành công */}
+            {successMessage && (
+              <motion.div 
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="mb-4 p-3 bg-green-50 border border-green-200 text-green-600 text-sm rounded-xl text-center font-medium"
+              >
+                {successMessage}
               </motion.div>
             )}
 

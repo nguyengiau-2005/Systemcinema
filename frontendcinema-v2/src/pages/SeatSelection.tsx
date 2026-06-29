@@ -7,6 +7,9 @@ import Footer from '../components/Footer';
 import axiosClient from '../api/axiosClient';
 import { socketService } from '../utils/socketClient';
 
+// Định danh cho tab/client hiện tại để không bị đè trạng thái ghế do chính mình gửi đi
+const CLIENT_ID = Math.random().toString(36).substring(7);
+
 interface Movie {
   id: string;
   title: string;
@@ -158,8 +161,7 @@ export default function SeatSelection() {
     }
   }, [movieId, showtimeId]);
 
-  // Định danh cho tab/client hiện tại để không bị đè trạng thái ghế do chính mình gửi đi
-  const clientId = useMemo(() => Math.random().toString(36).substring(7), []);
+  // Định danh cho tab/client hiện tại đã được chuyển ra ngoài component (CLIENT_ID)
 
   // Thiết lập WebSocket
   useEffect(() => {
@@ -173,7 +175,7 @@ export default function SeatSelection() {
       const { seatId, status, clientId: senderId } = message;
       
       // Bỏ qua tin nhắn do chính mình gửi đi để không làm mất trạng thái 'selected'
-      if (senderId === clientId) {
+      if (senderId === CLIENT_ID) {
         return;
       }
 
@@ -220,6 +222,13 @@ export default function SeatSelection() {
     setSeats(prevSeats =>
       prevSeats.map(s => s.id === showtimeSeatId ? { ...s, status: newStatus } : s)
     );
+
+    // Gửi tín hiệu giữ ghế ngay lập tức cho các tab/client khác qua WebSocket
+    socketService.sendMessage(`/app/seats/lock/${showtimeId}`, {
+      seatId: currentSeat.id,
+      status: newStatus === 'selected' ? 'taken' : 'available',
+      clientId: CLIENT_ID
+    });
   };
 
   const handleContinue = async () => {
@@ -243,7 +252,7 @@ export default function SeatSelection() {
           socketService.sendMessage(`/app/seats/lock/${showtimeId}`, {
             seatId: seat.id,
             status: 'taken',
-            clientId: clientId
+            clientId: CLIENT_ID
           });
         }
       } catch (err) {

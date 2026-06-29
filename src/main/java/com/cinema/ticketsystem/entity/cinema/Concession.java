@@ -29,4 +29,11 @@ public class Concession {
     private Double price;
 
     private Boolean active = true;
+
+    // F&B Inventory Management
+    @Column(nullable = false)
+    private Integer stockQuantity = 100;
+
+    @Column(nullable = false)
+    private Integer alertThreshold = 20;
 }

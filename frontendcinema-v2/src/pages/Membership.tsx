@@ -157,19 +157,35 @@ export default function Membership() {
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { title: 'Voucher 20k', pts: 200, color: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30' },
-                    { title: 'Bắp Rang Bơ', pts: 350, color: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30' },
-                    { title: 'Combo 1', pts: 500, color: 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/30' },
-                    { title: 'Vé 2D Miễn Phí', pts: 1000, color: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30' },
-                  ].map((gift, i) => (
-                    <div key={i} className={`border rounded-xl p-4 text-center cursor-pointer hover:shadow-md transition-all ${gift.color}`}>
-                      <h4 className="font-bold text-sm mb-1">{gift.title}</h4>
-                      <p className="text-xs font-semibold opacity-80">{gift.pts} điểm</p>
-                      <button className="mt-3 w-full py-1.5 bg-white/90 dark:bg-black/20 rounded-lg text-xs font-bold hover:bg-white transition-colors shadow-sm">
-                        Đổi Quà
-                      </button>
-                    </div>
-                  ))}
+                    { title: 'Voucher 20k', pts: 5000, color: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30' },
+                    { title: 'Bắp Rang Bơ', pts: 7000, color: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30' },
+                    { title: 'Combo 1', pts: 10000, color: 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/30' },
+                    { title: 'Vé 2D Miễn Phí', pts: 15000, color: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30' },
+                  ].map((gift, i) => {
+                    const canRedeem = (user?.points || 0) >= gift.pts;
+                    return (
+                      <div key={i} className={`border rounded-xl p-4 text-center ${canRedeem ? 'cursor-pointer hover:shadow-md' : 'opacity-70'} transition-all ${gift.color}`}>
+                        <h4 className="font-bold text-sm mb-1">{gift.title}</h4>
+                        <p className="text-xs font-semibold opacity-80">{gift.pts} điểm</p>
+                        <button 
+                          onClick={() => {
+                            if (!canRedeem) {
+                              alert(`Yêu cầu từ ${gift.pts} điểm trở lên mới được đổi ${gift.title}!`);
+                            } else {
+                              alert(`Đổi thành công: ${gift.title}! (Giả lập)`);
+                            }
+                          }}
+                          className={`mt-3 w-full py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm ${
+                            canRedeem 
+                              ? 'bg-white/90 dark:bg-black/20 hover:bg-white cursor-pointer' 
+                              : 'bg-gray-100 text-gray-500 cursor-not-allowed dark:bg-gray-800'
+                          }`}
+                        >
+                          Đổi Quà
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>

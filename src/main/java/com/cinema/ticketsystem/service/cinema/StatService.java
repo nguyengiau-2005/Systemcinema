@@ -93,6 +93,16 @@ public class StatService {
             );
         }).collect(Collectors.toList());
         response.setRecentTransactions(txList);
+        // Top 5 Movies by Revenue
+        List<Object[]> movieRevRaw = bookingRepository.getRevenueByMovie();
+        List<DashboardStatsResponse.TopMovieData> topMovies = movieRevRaw.stream()
+            .limit(5)
+            .map(row -> new DashboardStatsResponse.TopMovieData(
+                row[0] != null ? row[0].toString() : "Không rõ",
+                row[1] != null ? new BigDecimal(row[1].toString()) : BigDecimal.ZERO
+            ))
+            .collect(Collectors.toList());
+        response.setTopMovies(topMovies);
 
         return response;
     }

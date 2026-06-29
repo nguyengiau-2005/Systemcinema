@@ -37,7 +37,9 @@ public class BannerConfigController {
         List<BannerConfig> configs = bannerConfigRepository.findAllByOrderByDisplayOrderAsc();
         List<Movie> movies = new ArrayList<>();
         for (BannerConfig config : configs) {
-            movieRepository.findById(config.getMovieId()).ifPresent(movies::add);
+            if (config.getMovie() != null) {
+                movies.add(config.getMovie());
+            }
         }
         return ResponseEntity.ok(movies);
     }
@@ -55,8 +57,13 @@ public class BannerConfigController {
         // Lưu cấu hình mới theo thứ tự
         List<BannerConfig> configs = new ArrayList<>();
         for (int i = 0; i < movieIds.size(); i++) {
+            Movie movie = movieRepository.findById(movieIds.get(i)).orElse(null);
+            if (movie == null) {
+                return ResponseEntity.badRequest()
+                        .body("Không tìm thấy phim với ID: " + movieIds.get(i));
+            }
             BannerConfig config = new BannerConfig();
-            config.setMovieId(movieIds.get(i));
+            config.setMovie(movie);
             config.setDisplayOrder(i);
             configs.add(config);
         }

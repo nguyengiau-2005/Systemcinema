@@ -56,10 +56,18 @@ public class MovieService {
             existingMovie.setRating(movieDetails.getRating());
             existingMovie.setAgeRestriction(movieDetails.getAgeRestriction()); 
             existingMovie.setReleaseDate(movieDetails.getReleaseDate());       
+            existingMovie.setEndDate(movieDetails.getEndDate());
             existingMovie.setDirector(movieDetails.getDirector());
             existingMovie.setCast(movieDetails.getCast());
             existingMovie.setProductionCompany(movieDetails.getProductionCompany());
             existingMovie.setTrailerUrl(movieDetails.getTrailerUrl());
+            existingMovie.setFormats(movieDetails.getFormats());
+            if (movieDetails.getAverageScore() != null) {
+                existingMovie.setAverageScore(movieDetails.getAverageScore());
+            }
+            if (movieDetails.getTotalReviews() != null) {
+                existingMovie.setTotalReviews(movieDetails.getTotalReviews());
+            }
 
             // Biện pháp an toàn: Nếu Front-end chọn file ảnh mới thì ghi đè, nếu không giữ nguyên ảnh cũ
             if (file != null && !file.isEmpty()) {
@@ -80,5 +88,13 @@ public class MovieService {
         } else {
             throw new RuntimeException("Không thể xóa! Không tìm thấy phim với ID: " + id);
         }
+    }
+
+    // 5. Lật trạng thái HOT của phim
+    public Movie toggleHotStatus(Long id) {
+        Movie movie = movieRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với ID: " + id));
+        movie.setIsHot(movie.getIsHot() == null || !movie.getIsHot());
+        return movieRepository.save(movie);
     }
 }

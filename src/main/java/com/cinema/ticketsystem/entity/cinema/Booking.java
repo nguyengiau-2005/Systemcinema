@@ -22,6 +22,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "bookings")
@@ -53,11 +55,15 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     @JsonManagedReference(value = "booking-tickets")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Ticket> tickets;
 
     // Bổ sung thêm mối quan hệ này để lưu thông tin bắp nước/combo (nếu có)
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     @JsonManagedReference(value = "booking-foods")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<BookingFood> bookingFoods;
 
     // Mã đơn hàng do hệ thống tự sinh ra (VD: DH10293)

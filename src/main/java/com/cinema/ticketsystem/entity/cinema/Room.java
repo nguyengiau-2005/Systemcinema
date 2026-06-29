@@ -3,6 +3,7 @@ package com.cinema.ticketsystem.entity.cinema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -29,6 +30,7 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     @JsonManagedReference
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Seat> seats = new ArrayList<>();
 
     @Transient

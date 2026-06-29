@@ -20,14 +20,22 @@ export default function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
     setIsLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage('Mật khẩu không khớp!');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.phone)) {
+      setErrorMessage('Số điện thoại phải bao gồm đúng 10 chữ số!');
       setIsLoading(false);
       return;
     }
@@ -50,25 +58,13 @@ export default function Register() {
       const payload = response?.data ?? response;
 
       if (payload && payload.token) {
-        // Save token and user info
-        localStorage.setItem('token', payload.token);
-        if (payload.role) {
-          localStorage.setItem('role', payload.role);
-        }
+        // Save user data to ensure clean state later, but we will redirect to login instead of auto-login
+        // (Optional: You could also skip saving token if you strictly want them to login manually)
 
-        // Save user data for Header/Profile display
-        const userData = {
-          fullName: payload.user?.name || formData.name,
-          username: payload.user?.username || formData.email,
-          email: payload.user?.email || formData.email,
-          phone: payload.user?.phone || formData.phone,
-          role: payload.role || 'User',
-          avatar: payload.user?.avatar || null,
-        };
-        localStorage.setItem('user', JSON.stringify(userData));
-
-        // Registration successful, redirect to profile
-        navigate('/profile');
+        setSuccessMessage('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
       } else {
         setErrorMessage('Đăng ký thất bại. Vui lòng thử lại.');
       }
@@ -117,6 +113,16 @@ export default function Register() {
                   className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center font-medium"
                 >
                   {errorMessage}
+                </motion.div>
+              )}
+              {/* Success Message */}
+              {successMessage && (
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="p-3 bg-green-50 border border-green-200 text-green-600 text-sm rounded-xl text-center font-medium"
+                >
+                  {successMessage}
                 </motion.div>
               )}
               {/* Name */}

@@ -100,7 +100,14 @@ public class DiscountCodeController {
         }
         if (discountCodeDetails.getMaxUsage() != null) {
             discountCode.setMaxUsage(discountCodeDetails.getMaxUsage());
+        } else {
+            discountCode.setMaxUsage(null);
         }
+        
+        // Update new fields
+        discountCode.setMinOrderValue(discountCodeDetails.getMinOrderValue());
+        discountCode.setApplicableMovieId(discountCodeDetails.getApplicableMovieId());
+
         DiscountCode updated = discountCodeRepository.save(discountCode);
         return ResponseEntity.ok(updated);
     }

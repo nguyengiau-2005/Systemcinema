@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from 'next-themes';
 import CineBot from './CineBot';
 import LuckyWheel from './LuckyWheel';
+import LevelUpModal from './LevelUpModal';
 
 // Define the shape of your user data for better TypeScript support
 interface UserData {
@@ -23,6 +24,7 @@ export default function Header() {
   const [user, setUser] = useState<UserData | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [levelUpData, setLevelUpData] = useState({ show: false, newLevel: 'Gold', pointsEarned: 0 });
 
   // Ref for the dropdown menu to detect outside clicks
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,14 +38,33 @@ export default function Header() {
   };
 
   useEffect(() => {
-    try {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        setUser(JSON.parse(userData));
+    const loadUser = () => {
+      try {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      } catch (error) {
+        console.error("Failed to parse user data from local storage", error);
       }
-    } catch (error) {
-      console.error("Failed to parse user data from local storage", error);
-    }
+    };
+
+    const handleLevelUp = (e: any) => {
+      setLevelUpData({
+        show: true,
+        newLevel: e.detail?.newLevel || 'Gold',
+        pointsEarned: e.detail?.pointsEarned || 0
+      });
+    };
+
+    loadUser();
+    window.addEventListener('userUpdated', loadUser);
+    window.addEventListener('levelUp', handleLevelUp);
+    
+    return () => {
+      window.removeEventListener('userUpdated', loadUser);
+      window.removeEventListener('levelUp', handleLevelUp);
+    };
   }, []);
 
   // Handle clicking outside the dropdown to close it
@@ -99,6 +120,9 @@ export default function Header() {
             </Link>
             <Link to="/membership" className="hover:opacity-80 transition-opacity capitalize">
               {t('header.membership', 'Thành Viên')}
+            </Link>
+            <Link to="/games" className="hover:opacity-80 transition-opacity font-bold text-yellow-400">
+              Mini Game
             </Link>
             <a href="#promotions" className="hover:opacity-80 transition-opacity">
               {t('header.promotions', 'Khuyến Mãi')}
@@ -219,6 +243,9 @@ export default function Header() {
               <Link to="/membership" onClick={() => setShowMobileMenu(false)} className="hover:opacity-80 transition-opacity py-2">
                 {user?.role?.toLowerCase() === 'user' ? 'Khách Hàng' : user?.role || 'Thành Viên'}
               </Link>
+              <Link to="/games" onClick={() => setShowMobileMenu(false)} className="hover:opacity-80 transition-opacity py-2 font-bold text-yellow-400">
+                Mini Game
+              </Link>
               <a href="#promotions" onClick={() => setShowMobileMenu(false)} className="hover:opacity-80 transition-opacity py-2">
                 Khuyến Mãi
               </a>
@@ -235,6 +262,12 @@ export default function Header() {
     </header>
     <CineBot />
     <LuckyWheel />
+    <LevelUpModal 
+      isOpen={levelUpData.show} 
+      onClose={() => setLevelUpData(prev => ({ ...prev, show: false }))} 
+      newLevel={levelUpData.newLevel} 
+      pointsEarned={levelUpData.pointsEarned} 
+    />
     </>
   );
 }

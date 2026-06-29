@@ -18,6 +18,25 @@ public class AuthService {
     private JwtService jwtService;
 
     public String register(User user) {
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("Tên đăng nhập không được để trống");
+        }
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("Email không được để trống");
+        }
+        if (user.getPhone() == null || !user.getPhone().matches("\\d{10}")) {
+            throw new RuntimeException("Số điện thoại phải bao gồm đúng 10 chữ số");
+        }
+        if (user.getPassword() == null || user.getPassword().length() < 6) {
+            throw new RuntimeException("Mật khẩu phải có ít nhất 6 ký tự");
+        }
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại");
+        }
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email đã được sử dụng");
+        }
+
         // Mã hóa mật khẩu trước khi lưu
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 

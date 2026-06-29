@@ -339,15 +339,6 @@ public class ShowtimeService {
         }
     }
 
-    private Settings getDefaultSettings() {
-        Settings defaults = new Settings();
-        defaults.setPeakHourSurcharge(0.2); // 20%
-        defaults.setWeekendSurcharge(0.1); // 10%
-        defaults.setVipSeatSurcharge(20000.0);
-        defaults.setStudentDiscount(0.1); // 10%
-        return defaults;
-    }
-
     public List<Showtime> getShowtimesForCurrentWeek(Long movieId) {
         LocalDate today = LocalDate.now();
 

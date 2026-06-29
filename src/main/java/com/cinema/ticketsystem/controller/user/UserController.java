@@ -1,6 +1,7 @@
 package com.cinema.ticketsystem.controller.user;
 
 import com.cinema.ticketsystem.entity.user.User;
+import com.cinema.ticketsystem.entity.user.Role;
 import com.cinema.ticketsystem.service.user.UserService;
 import com.cinema.ticketsystem.service.jwt.AuthService;
 import com.cinema.ticketsystem.repository.cinema.BookingRepository;
@@ -70,8 +71,10 @@ public class UserController {
             }
         }
         
-        // Tính điểm thưởng: 1 điểm cho mỗi 10.000 VNĐ đã chi tiêu
-        int points = totalSpent.divide(BigDecimal.valueOf(10000), 0, java.math.RoundingMode.DOWN).intValue();
+        // Tính điểm thưởng: 1 điểm cho mỗi 10.000 VNĐ đã chi tiêu cộng điểm kiếm được từ game
+        int pointsFromSpent = totalSpent.divide(BigDecimal.valueOf(10000), 0, java.math.RoundingMode.DOWN).intValue();
+        int extraPoints = currentUser.getLoyaltyPoints() != null ? currentUser.getLoyaltyPoints() : 0;
+        int points = pointsFromSpent + extraPoints;
         
         // Tính hạng thành viên dựa trên điểm
         String membershipLevel = "Silver";
@@ -154,5 +157,38 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Lỗi upload avatar: " + e.getMessage());
         }
+    }
+
+    /**
+     * API cập nhật thông tin người dùng (dành cho Admin)
+     * Endpoint: PUT http://localhost:8080/api/users/{id}
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateUserByAdmin(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        User user = userService.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy người dùng!");
+        }
+
+        if (request.containsKey("fullName")) {
+            user.setFullName(request.get("fullName"));
+        }
+        if (request.containsKey("email")) {
+            user.setEmail(request.get("email"));
+        }
+        if (request.containsKey("phone")) {
+            user.setPhone(request.get("phone"));
+        }
+        if (request.containsKey("role")) {
+            try {
+                user.setRole(Role.valueOf(request.get("role")));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vai trò không hợp lệ!");
+            }
+        }
+        
+        userService.save(user);
+        return ResponseEntity.ok(user);
     }
 }

@@ -88,4 +88,17 @@ public class MovieController {
                     .body("Không thể xóa phim này do ràng buộc dữ liệu lịch sử hóa đơn: " + e.getMessage());
         }
     }
+
+    // 5. Bật/tắt trạng thái HOT của phim
+    // Endpoint: PUT /api/movies/{id}/toggle-hot
+    @PutMapping("/{id}/toggle-hot")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> toggleHotStatus(@PathVariable Long id) {
+        try {
+            movieService.toggleHotStatus(id);
+            return ResponseEntity.ok().body(java.util.Collections.singletonMap("success", true));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

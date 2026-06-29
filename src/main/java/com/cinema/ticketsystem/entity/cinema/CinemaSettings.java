@@ -50,4 +50,12 @@ public class CinemaSettings {
 
     @Column(name = "holiday_dates", columnDefinition = "TEXT")
     private String holidayDates = "01/01,30/04,01/05,02/09";
+
+    // Giảm giá trẻ em (%)
+    @Column(name = "child_discount")
+    private Integer childDiscount = 0;
+
+    // Ghi chú / Giới thiệu về rạp
+    @Column(name = "notes", columnDefinition = "TEXT")
+    private String notes;
 }

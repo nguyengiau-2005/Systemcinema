@@ -57,14 +57,14 @@ public class BookingController {
 
     // 2. Lấy tất cả booking (chỉ admin)
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
 
     // 2b. Lấy N booking gần nhất đã thanh toán (cho Notification Center)
     @GetMapping("/recent")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<?> getRecentBookings(
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int limit) {
         try {
@@ -93,7 +93,7 @@ public class BookingController {
                 .orElseThrow(() -> new RuntimeException("Booking không tồn tại!"));
 
         User currentUser = authService.getCurrentUser();
-        if (currentUser.getRole() != Role.ADMIN && !booking.getUser().getId().equals(currentUser.getId())) {
+        if (currentUser.getRole() != Role.ADMIN && currentUser.getRole() != Role.EMPLOYEE && !booking.getUser().getId().equals(currentUser.getId())) {
             return ResponseEntity.status(403).body("Bạn không có quyền xem booking này!");
         }
 
@@ -155,7 +155,7 @@ public class BookingController {
                     .orElseThrow(() -> new RuntimeException("Booking không tồn tại!"));
 
             User currentUser = authService.getCurrentUser();
-            if (currentUser.getRole() != Role.ADMIN && !booking.getUser().getId().equals(currentUser.getId())) {
+            if (currentUser.getRole() != Role.ADMIN && currentUser.getRole() != Role.EMPLOYEE && !booking.getUser().getId().equals(currentUser.getId())) {
                 return ResponseEntity.status(403).body("Bạn không có quyền hủy booking này!");
             }
 
@@ -244,7 +244,7 @@ public class BookingController {
                     .orElseThrow(() -> new RuntimeException("Booking không tồn tại!"));
 
             User currentUser = authService.getCurrentUser();
-            if (!booking.getUser().getId().equals(currentUser.getId()) && currentUser.getRole() != Role.ADMIN) {
+            if (!booking.getUser().getId().equals(currentUser.getId()) && currentUser.getRole() != Role.ADMIN && currentUser.getRole() != Role.EMPLOYEE) {
                 return ResponseEntity.status(403).body("Bạn không có quyền xem QR thanh toán này!");
             }
 

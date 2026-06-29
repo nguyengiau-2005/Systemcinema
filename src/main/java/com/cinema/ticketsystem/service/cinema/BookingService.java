@@ -25,7 +25,7 @@ import com.cinema.ticketsystem.repository.cinema.BookingRepository;
 import com.cinema.ticketsystem.repository.cinema.ConcessionRepository;
 import com.cinema.ticketsystem.repository.cinema.DiscountCodeRepository;
 import com.cinema.ticketsystem.repository.cinema.ShowtimeSeatRepository;
-import com.cinema.ticketsystem.repository.cinema.TicketRepository;
+
 
 @Service
 public class BookingService {
@@ -109,6 +109,24 @@ public class BookingService {
         if (discountCode != null && !discountCode.isBlank()) {
             DiscountCode code = discountCodeRepository.findByCodeIgnoreCaseAndActiveTrue(discountCode)
                     .orElseThrow(() -> new RuntimeException("Mã không hợp lệ"));
+
+            if (code.getExpirationDate() != null && code.getExpirationDate().isBefore(java.time.LocalDate.now())) {
+                throw new RuntimeException("Mã giảm giá đã hết hạn");
+            }
+            if (code.getMaxUsage() != null && code.getUsedCount() >= code.getMaxUsage()) {
+                throw new RuntimeException("Mã giảm giá đã hết lượt sử dụng");
+            }
+            if (code.getMinOrderValue() != null && total.compareTo(BigDecimal.valueOf(code.getMinOrderValue())) < 0) {
+                throw new RuntimeException("Đơn hàng chưa đạt giá trị tối thiểu (" + code.getMinOrderValue() + "đ) để áp dụng mã này");
+            }
+            if (code.getApplicableMovieId() != null) {
+                boolean isApplicable = tickets.stream().allMatch(t -> 
+                    t.getShowtimeSeat().getShowtime().getMovie().getId().equals(code.getApplicableMovieId())
+                );
+                if (!isApplicable) {
+                    throw new RuntimeException("Mã giảm giá này không áp dụng cho bộ phim bạn chọn");
+                }
+            }
 
             if ("PERCENT".equalsIgnoreCase(code.getType()) || "PERCENTAGE".equalsIgnoreCase(code.getType())) {
                 discountAmount = total.multiply(BigDecimal.valueOf(code.getValue()).divide(BigDecimal.valueOf(100)));
